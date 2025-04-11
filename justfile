@@ -1,8 +1,33 @@
+set export
+
 help:
 	just --list
 
-debugger connect:
-	openocd -f interface/stlink.cfg -f target/stm32f3x.cfg
+debugger option:
+	#!/usr/bin/nu
+	match $env.option {
+		"connect" => { openocd -f interface/stlink.cfg -f target/stm32f3x.cfg }
+		_ => { print "invalid option"; exit 1 }
+	}
 
-print elf-headers:
-	cargo readobj --bin app -- --file-headers
+print option *flags:
+	#!/usr/bin/nu
+	let flags = $env.flags | split row ' '
+	let release = '--release' in $flags
+	match $env.option {
+		"elf-headers" => {
+			if $release {
+				cargo readobj --bin app --release -- --file-headers
+			} else {
+				cargo readobj --bin app -- --file-headers
+			}
+		}
+		"size" => {
+			if $release {
+				cargo size --bin app --release -- -A
+			} else {
+				cargo size --bin app -- -A
+			}
+		}
+		_ => { print "invalid option"; exit 1 }
+	}
