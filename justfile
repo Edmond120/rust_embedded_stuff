@@ -29,5 +29,12 @@ print option *flags:
 				cargo size --bin app -- -A
 			}
 		}
+		"disassemble" => {
+			if $release {
+				cargo objdump --bin app --release -- --disassemble --no-show-raw-insn --print-imm-hex
+			} else {
+				cargo objdump --bin app -- --disassemble --no-show-raw-insn --print-imm-hex
+			}
+		}
 		_ => { print "invalid option"; exit 1 }
 	}
